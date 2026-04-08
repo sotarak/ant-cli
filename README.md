@@ -24,6 +24,7 @@
 You can run Ant CLI directly using `npx` (recommended) or install it globally on your machine.
 
 ### Using `npx` (Recommended)
+
 This guarantees you are always using the latest agent configurations locally without polluting your global dependencies.
 
 ```bash
@@ -31,6 +32,7 @@ npx @sotarak/ant-cli init
 ```
 
 ### Global Install
+
 If you prefer having the `ant` executable command available anywhere on your system:
 
 ```bash
@@ -46,6 +48,7 @@ pnpm add -g @sotarak/ant-cli
 ## 🛠 Usage
 
 ### Bootstrap your project
+
 Initializes a new `.agent` directory in your project. It safely checks for existing configurations, detects your framework automatically, and bootstraps the correct workflows and skills.
 
 ```bash
@@ -55,6 +58,7 @@ ant init -f      # Force an overwrite of an existing .agent directory
 ```
 
 ### Check agent health
+
 Validates the diagnostic health of the `.agent` setup in your project. It checks for the required folder structure (e.g., `workflows/`, `skills/`) and verifies if your project templates are outdated compared to the CLI version.
 
 ```bash
@@ -62,6 +66,7 @@ ant doctor
 ```
 
 ### Update agent templates
+
 Upgrades an existing `.agent` directory to the latest CLI template version. It automatically pulls the stored framework selection and safely patches your templates without breaking your custom modifications.
 
 ```bash
@@ -69,6 +74,7 @@ ant update
 ```
 
 ### Open in Antigravity IDE
+
 Opens the current project repository directly in the Antigravity IDE natively as a detached background process.
 
 ```bash
@@ -84,6 +90,7 @@ ant open ./apps  # Open a specific path
 We welcome contributions! If you're looking to modify Ant CLI locally:
 
 1. **Clone the repository & Install dependencies**
+
    ```bash
    git clone git@github.com:sotarak/ant-cli.git
    cd ant-cli
@@ -91,12 +98,14 @@ We welcome contributions! If you're looking to modify Ant CLI locally:
    ```
 
 2. **Run Locally during Development**
+
    ```bash
    pnpm dev init ./example
    ```
 
 3. **Check Code Quality**
    We enforce strict linting and formatting. Run these before committing:
+
    ```bash
    pnpm run format      # Formats code using Prettier
    pnpm run lint        # Verifies code rules using Biome
@@ -110,4 +119,5 @@ We welcome contributions! If you're looking to modify Ant CLI locally:
    ```
 
 ## 📄 License
+
 This project is licensed under the [MIT](LICENSE) License.

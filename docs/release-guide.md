@@ -1,6 +1,6 @@
 # Release Guide
 
-The **Ant CLI** project uses [Changesets](https://github.com/changesets/changesets) for declarative versioning and releasing to npm. 
+The **Ant CLI** project uses [Changesets](https://github.com/changesets/changesets) for declarative versioning and releasing to npm.
 
 This guide explains the typical workflow for a maintainer/developer to cut a new release.
 
@@ -15,7 +15,7 @@ npx changeset
 ```
 
 1. **Select Packages:** You will be prompted to select which package the change affects (usually just `ant-cli`).
-2. **Select Issue Type:** 
+2. **Select Issue Type:**
    - `major` for breaking changes.
    - `minor` for new features.
    - `patch` for bug fixes.
@@ -34,6 +34,7 @@ npx changeset version
 ```
 
 This will automatically:
+
 - Read all pending changesets.
 - Delete the consumed files from `.changeset/`.
 - Bump the version in `package.json`.
