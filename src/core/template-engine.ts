@@ -74,10 +74,7 @@ async function copyDirectory(src: string, target: string): Promise<boolean> {
  *                   (used to compute readable relative paths).
  * @returns Array of formatted relative paths, e.g. `".agent/workflows/dev.md"`.
  */
-async function scanCreatedFiles(
-  baseDir: string,
-  agentDir: string,
-): Promise<string[]> {
+async function scanCreatedFiles(baseDir: string): Promise<string[]> {
   if (!(await fs.pathExists(baseDir))) return [];
 
   // Walk the directory tree recursively
@@ -92,7 +89,7 @@ async function scanCreatedFiles(
         results.push(...(await walk(fullPath)));
       } else {
         // Format as ".agent/<relative>" for display
-        const relative = path.relative(agentDir, fullPath);
+        const relative = path.relative(baseDir, fullPath);
         results.push(path.join(AGENT_DIR_NAME, relative));
       }
     }
@@ -152,7 +149,7 @@ export async function bootstrapTemplates(
   const templatesDir = getTemplatesDir();
 
   const sharedSrc = path.join(templatesDir, SHARED_DIR_NAME);
-  const frameworkSrc = path.join(templatesDir, framework, AGENT_DIR_NAME);
+  const frameworkSrc = path.join(templatesDir, framework);
 
   // Ensure output directory exists before any copy operations
   await fs.ensureDir(agentDir);
@@ -162,7 +159,7 @@ export async function bootstrapTemplates(
   // Step 1 — Copy shared templates (available to all frameworks)
   const sharedCopied = await copyDirectory(sharedSrc, agentDir);
   if (sharedCopied) {
-    const sharedFiles = await scanCreatedFiles(agentDir, agentDir);
+    const sharedFiles = await scanCreatedFiles(sharedSrc);
     createdFiles.push(...sharedFiles);
   }
 
@@ -170,7 +167,7 @@ export async function bootstrapTemplates(
   const frameworkCopied = await copyDirectory(frameworkSrc, agentDir);
   if (frameworkCopied) {
     // Re-scan to capture newly added / overwritten framework files
-    const allFiles = await scanCreatedFiles(agentDir, agentDir);
+    const allFiles = await scanCreatedFiles(frameworkSrc);
     // Merge without duplicating files already captured from the shared step
     for (const file of allFiles) {
       if (!createdFiles.includes(file)) {
