@@ -110,11 +110,7 @@ try {
   await charge();
 } catch (error) {
   // ✅ Preserves stack trace and adds metadata
-  Logger.error("[PaymentService] Charge failed", {
-    reason: error.message,
-    stack: error.stack,
-    orderId: "123",
-  });
+  Logger.error("[PaymentService] Charge failed", error);
 }
 ```
 
