@@ -1,204 +1,69 @@
 ---
 name: clean-code
-description: Pragmatic coding standards - concise, direct, no over-engineering, no unnecessary comments
-allowed-tools: Read, Write, Edit
-version: 2.0
-priority: CRITICAL
+description: Clean code standards, optimized, enforcing SOLID principles and easy to maintain.
 ---
 
-# Clean Code - Pragmatic AI Coding Standards
+# Clean Code - Coding Standards & Maintainability (NestJS)
 
-> **CRITICAL SKILL** - Be **concise, direct, and solution-focused**.
+> **CRITICAL SKILL** - This module serves as an internal, self-contained standard (independent). It requires that all Agents perform a self-check on their generated code. We emphasize tight architecture, optimization, and scalable standards.
 
 ---
 
-## Core Principles
+## 1. Core Principles
 
-| Principle     | Rule                                                       |
-| ------------- | ---------------------------------------------------------- |
-| **SRP**       | Single Responsibility - each function/class does ONE thing |
-| **DRY**       | Don't Repeat Yourself - extract duplicates, reuse          |
-| **KISS**      | Keep It Simple - simplest solution that works              |
-| **YAGNI**     | You Aren't Gonna Need It - don't build unused features     |
-| **Boy Scout** | Leave code cleaner than you found it                       |
+Strictly adhere to the **5 SOLID principles** to ensure the application is easily maintainable, easy to upgrade, and resilient to breaking changes when scaling:
 
----
-
-## Naming Rules
-
-| Element       | Convention                                            |
-| ------------- | ----------------------------------------------------- |
-| **Variables** | Reveal intent: `userCount` not `n`                    |
-| **Functions** | Verb + noun: `getUserById()` not `user()`             |
-| **Booleans**  | Question form: `isActive`, `hasPermission`, `canEdit` |
-| **Constants** | SCREAMING_SNAKE: `MAX_RETRY_COUNT`                    |
-
-> **Rule:** If you need a comment to explain a name, rename it.
+| Principle                     | Detailed Description                                                                                                             |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **S** (Single Responsibility) | Each class/function/module is allowed to handle exactly ONE responsibility (keep it simple and clear).                           |
+| **O** (Open-Closed)           | The design must be flexible enough to allow **extensions** (adding new features) **without modifying** existing source code.     |
+| **L** (Liskov Substitution)   | Child classes must be substitutable for their parent classes without affecting the correctness of the entire program.            |
+| **I** (Interface Segregation) | Split large interfaces into multiple smaller, specialized interfaces rather than one monolithic interface.                       |
+| **D** (Dependency Inversion)  | Depend on abstractions (interfaces), not implementations (concrete classes). Maximize the use of Dependency Injection in NestJS. |
 
 ---
 
-## Function Rules
+## 2. File & Function Rules
 
-| Rule                | Description                           |
-| ------------------- | ------------------------------------- |
-| **Small**           | Max 20 lines, ideally 5-10            |
-| **One Thing**       | Does one thing, does it well          |
-| **One Level**       | One level of abstraction per function |
-| **Few Args**        | Max 3 arguments, prefer 0-2           |
-| **No Side Effects** | Don't mutate inputs unexpectedly      |
-
----
-
-## Code Structure
-
-| Pattern           | Apply                             |
-| ----------------- | --------------------------------- |
-| **Guard Clauses** | Early returns for edge cases      |
-| **Flat > Nested** | Avoid deep nesting (max 2 levels) |
-| **Composition**   | Small functions composed together |
-| **Colocation**    | Keep related code close           |
+| Rule                | Guidelines                                                                                                                                                                 |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **File Size Limit** | Limit file sizes strictly. **Maximum 200 - 300 lines**. Extraneous code or long logic sequences must be decoupled into separate services, components, or helper functions. |
+| **Small Functions** | Functions must be concise and straightforward (usually < 20 lines). If a function requires multiple distinct steps, extract them into clearly named `private` methods.     |
+| **Guard Clauses**   | Apply _early returns_ at the start of functions to handle missing or invalid inputs, avoiding nested IF statements wherever possible (maximum 2 levels of nesting).        |
+| **No Side Effects** | Functions should not sneakily alter external variables or states. Inputs and outputs must behave consistently.                                                             |
 
 ---
 
-## AI Coding Style
+## 3. Documentation & Comments
 
-| Situation             | Action                |
-| --------------------- | --------------------- |
-| User asks for feature | Write it directly     |
-| User reports bug      | Fix it, don't explain |
-| No clear requirement  | Ask, don't assume     |
+This standard aims for code clarity, seamless handovers, and future maintainability:
 
----
-
-## Anti-Patterns (DON'T)
-
-| ❌ Pattern               | ✅ Fix                  |
-| ------------------------ | ----------------------- |
-| Comment every line       | Delete obvious comments |
-| Helper for one-liner     | Inline the code         |
-| Factory for 2 objects    | Direct instantiation    |
-| utils.ts with 1 function | Put code where used     |
-| "First we import..."     | Just write code         |
-| Deep nesting             | Guard clauses           |
-| Magic numbers            | Named constants         |
-| God functions            | Split by responsibility |
+| Standard                      | Application                                                                                                                                                                         |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mandatory JSDoc Comments**  | Every distinct method, class, and interface MUST be described using professional JSDoc comments. Never leave a function uncommented unless its logic is universally obvious.        |
+| **Explain the Logic ("Why")** | For complex business logic, unique algorithms, or specific conditionals, provide a short inline comment explaining the rationale. Code explains "What", but Comments explain "Why". |
+| **Meaningful Variable Names** | Minimize ambiguous terminology (`x`, `y`, `flag`, `data2`). Variables/Functions must fully express their role (e.g., `hasPermission`, `isValidUser`, `fetchActiveCampaigns`).       |
 
 ---
 
-## 🔴 Before Editing ANY File (THINK FIRST!)
+## 4. Optimization & Refactoring
 
-**Before changing a file, ask yourself:**
-
-| Question                        | Why                      |
-| ------------------------------- | ------------------------ |
-| **What imports this file?**     | They might break         |
-| **What does this file import?** | Interface changes        |
-| **What tests cover this?**      | Tests might fail         |
-| **Is this a shared component?** | Multiple places affected |
-
-**Quick Check:**
-
-```
-File to edit: UserService.ts
-└── Who imports this? → UserController.ts, AuthController.ts
-└── Do they need changes too? → Check function signatures
-```
-
-> 🔴 **Rule:** Edit the file + all dependent files in the SAME task.
-> 🔴 **Never leave broken imports or missing updates.**
+- Avoid duplicating code (**DRY** - Don't Repeat Yourself). If identical logic appears twice, consider extracting it into a shared function.
+- Keep the import order tidy (System Modules -> External Libraries -> Internal Code). Remove unused imports completely.
+- Strictly eliminate **Magic Numbers** (hardcoded numbers with no context) and **Hardcode Strings**, replacing them with explicit **Constants** or **Enums**.
 
 ---
 
-## Summary
+## 5. Independent Self-Review Checklist
 
-| Do                     | Don't                     |
-| ---------------------- | ------------------------- |
-| Write code directly    | Write tutorials           |
-| Let code self-document | Add obvious comments      |
-| Fix bugs immediately   | Explain the fix first     |
-| Inline small things    | Create unnecessary files  |
-| Name things clearly    | Use abbreviations         |
-| Keep functions small   | Write 100+ line functions |
+> 🔴 **MANDATORY:** This skill does not depend on any external scripts mapping or external reference files. The process is completely self-contained via this Self-Review Checklist.
 
-> **Remember: The user wants working code, not a programming lesson.**
+**Before declaring any edits or features complete, MUST ask these 5 questions and ensure compliance:**
 
----
+1. [ ] Does the new or modified file exceed the **300 line** limit? _(If yes: divide and conquer immediately)._
+2. [ ] Do all Modules, Services, and Controllers strictly adhere to **SOLID principles** without cramming logic into one place?
+3. [ ] Have all important Functions, Classes, and complex logic blocks been provided with sufficient **JSDoc / Comments**?
+4. [ ] Have lengthy IF/ELSE blocks been refactored into **Guard Clauses (Early Returns)**?
+5. [ ] Could a new developer joining the project understand the purpose of this code block within 3 minutes of reading, without needing to ask questions?
 
-## 🔴 Self-Check Before Completing (MANDATORY)
-
-**Before saying "task complete", verify:**
-
-| Check                     | Question                          |
-| ------------------------- | --------------------------------- |
-| ✅ **Goal met?**          | Did I do exactly what user asked? |
-| ✅ **Files edited?**      | Did I modify all necessary files? |
-| ✅ **Code works?**        | Did I test/verify the change?     |
-| ✅ **No errors?**         | Lint and TypeScript pass?         |
-| ✅ **Nothing forgotten?** | Any edge cases missed?            |
-
-> 🔴 **Rule:** If ANY check fails, fix it before completing.
-
----
-
-## Verification Scripts (MANDATORY)
-
-> 🔴 **CRITICAL:** Each agent runs ONLY their own skill's scripts after completing work.
-
-### Agent → Script Mapping
-
-| Agent                     | Script          | Command                                                                           |
-| ------------------------- | --------------- | --------------------------------------------------------------------------------- |
-| **frontend-specialist**   | UX Audit        | `python ~/.claude/skills/frontend-design/scripts/ux_audit.py .`                   |
-| **frontend-specialist**   | A11y Check      | `python ~/.claude/skills/frontend-design/scripts/accessibility_checker.py .`      |
-| **backend-specialist**    | API Validator   | `python ~/.claude/skills/api-patterns/scripts/api_validator.py .`                 |
-| **mobile-developer**      | Mobile Audit    | `python ~/.claude/skills/mobile-design/scripts/mobile_audit.py .`                 |
-| **database-architect**    | Schema Validate | `python ~/.claude/skills/database-design/scripts/schema_validator.py .`           |
-| **security-auditor**      | Security Scan   | `python ~/.claude/skills/vulnerability-scanner/scripts/security_scan.py .`        |
-| **seo-specialist**        | SEO Check       | `python ~/.claude/skills/seo-fundamentals/scripts/seo_checker.py .`               |
-| **seo-specialist**        | GEO Check       | `python ~/.claude/skills/geo-fundamentals/scripts/geo_checker.py .`               |
-| **performance-optimizer** | Lighthouse      | `python ~/.claude/skills/performance-profiling/scripts/lighthouse_audit.py <url>` |
-| **test-engineer**         | Test Runner     | `python ~/.claude/skills/testing-patterns/scripts/test_runner.py .`               |
-| **test-engineer**         | Playwright      | `python ~/.claude/skills/webapp-testing/scripts/playwright_runner.py <url>`       |
-| **Any agent**             | Lint Check      | `python ~/.claude/skills/lint-and-validate/scripts/lint_runner.py .`              |
-| **Any agent**             | Type Coverage   | `python ~/.claude/skills/lint-and-validate/scripts/type_coverage.py .`            |
-| **Any agent**             | i18n Check      | `python ~/.claude/skills/i18n-localization/scripts/i18n_checker.py .`             |
-
-> ❌ **WRONG:** `test-engineer` running `ux_audit.py`
-> ✅ **CORRECT:** `frontend-specialist` running `ux_audit.py`
-
----
-
-### 🔴 Script Output Handling (READ → SUMMARIZE → ASK)
-
-**When running a validation script, you MUST:**
-
-1. **Run the script** and capture ALL output
-2. **Parse the output** - identify errors, warnings, and passes
-3. **Summarize to user** in this format:
-
-```markdown
-## Script Results: [script_name.py]
-
-### ❌ Errors Found (X items)
-
-- [File:Line] Error description 1
-- [File:Line] Error description 2
-
-### ⚠️ Warnings (Y items)
-
-- [File:Line] Warning description
-
-### ✅ Passed (Z items)
-
-- Check 1 passed
-- Check 2 passed
-
-**Should I fix the X errors?**
-```
-
-4. **Wait for user confirmation** before fixing
-5. **After fixing** → Re-run script to confirm
-
-> 🔴 **VIOLATION:** Running script and ignoring output = FAILED task.
-> 🔴 **VIOLATION:** Auto-fixing without asking = Not allowed.
-> 🔴 **Rule:** Always READ output → SUMMARIZE → ASK → then fix.
+> ❌ **VIOLATION:** It is strictly prohibited to hand over a task when the file is a mess (bad SOLID compliance), exceeds the recommended size limit, lacks all comments, or references non-existent modules.
