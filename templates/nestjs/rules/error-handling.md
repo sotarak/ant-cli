@@ -1,141 +1,49 @@
 ---
 trigger: glob
-globs: *.ts
+globs: **/*.service.ts, **/*.controller.ts, **/*.guard.ts, **/*.strategy.ts, **/*.interceptor.ts, **/*.pipe.ts, **/*.filter.ts, **/*.middleware.ts, **/*.resolver.ts, **/*.module.ts, **/*.handler.ts, **/*.processor.ts
 ---
 
-You are a senior NestJS developer. Follow these strict guidelines for error handling using the project's custom exception system.
+You are a senior NestJS developer. Follow these strict guidelines for error handling.
 
-## 1. Use ErrorException with ErrorCodes
+## 1. Centralized Error System
 
-The system uses a custom `ErrorException` class with predefined `ErrorCodes` enum.
+Always use the custom `ErrorException` with predefined `ErrorCodes` from `@libs/core/constants`. Let errors bubble up to the `GlobalExceptionFilter` (which handles HTTP mapping and OpenTelemetry tracing).
 
 ```typescript
-import { ErrorException } from "@libs/core/exceptions";
-import { ErrorCodes } from "@libs/core/constants";
-
-// ❌ Bad - Don't use NestJS exceptions directly
-throw new BadRequestException("Invalid input");
+// ❌ Bad - Using NestJS native exceptions directly
 throw new NotFoundException("User not found");
 
-// ✅ Good - Use ErrorException with error code
-throw new ErrorException(ErrorCodes.HttpBadRequest);
-throw new ErrorException(ErrorCodes.HttpNotFound);
-
-// ✅ Best - Include message and errors context
+// ✅ Good - Using ErrorException
 throw new ErrorException({
-  errorCode: ErrorCodes.InvestorEmailExists,
-  message: "Email is already used by another investor",
-  errors: [{ field: "email", value: dto.email }],
+  errorCode: ErrorCodes.HttpNotFound,
+  message: "User not found", // Optional
+  errors: [{ field: "email", value: dto.email }], // Optional field details
 });
 ```
 
-## 2. Error Codes Structure
+## 2. Error Code Ranges (Reference)
 
-The system defines error codes in `ErrorCodes` enum with categorized ranges:
+Find & Add codes in the `ErrorCodes` enum grouped by domain:
 
-| Range       | Category    | Examples                                             |
-| ----------- | ----------- | ---------------------------------------------------- |
-| `0`         | Success     | `HttpSuccess`                                        |
-| `1000-1099` | HTTP errors | `HttpBadRequest`, `HttpNotFound`, `HttpUnauthorized` |
+- `0`: Success (`HttpSuccess`)
+- `1000-1099`: HTTP errors (`HttpBadRequest`, `HttpNotFound`, etc.)
 
-### Adding New Error Codes
+## 3. Error Handling Best Practices
 
-When you need to add a new error code:
+### Business Logic
 
-1. Search for `ErrorCodes` enum in the codebase to find its location
-2. Add the new error code following the established range conventions
-3. Search for `ErrorMessages` constant and add the corresponding message
-4. Keep error codes grouped by domain/category
-
-## 3. ErrorResponse Interface
-
-Standard error response structure:
+Don't use `try/catch` for standard business flow. Only use it for logging context or fallback recovery.
 
 ```typescript
-interface ErrorResponse {
-  errorCode: ErrorCodes; // Numeric error code
-  message?: string; // Error message
-  errors?: Record<string, unknown>[]; // Field-level error details
-  timestamp?: string; // Auto-generated timestamp
-}
-```
-
-## 4. Global Exception Filter
-
-The system uses `GlobalExceptionFilter` to handle all exceptions:
-
-- Auto-maps HTTP status → ErrorCodes
-- Auto-generates timestamp in response
-- Integrates OpenTelemetry tracing (x-trace-id header)
-- **Always returns HTTP 200** with errorCode in body
-
-```typescript
-// Response format
-{
-  "errorCode": 1005,
-  "message": "Not found",
-  "timestamp": "2024-02-02T08:00:00.000Z"
-}
-```
-
-## 5. Best Practices
-
-### Don't use try/catch for business errors
-
-Let errors bubble up to GlobalExceptionFilter:
-
-```typescript
-// ❌ Bad - Catch and re-throw
-try {
-  await this.mxvApi.createInvestor(dto);
-} catch (error) {
-  throw new ErrorException(ErrorCodes.MxvApiError);
-}
-
-// ✅ Good - Let error bubble up
-await this.mxvApi.createInvestor(dto);
-```
-
-### Use try/catch only for recovery or special logging
-
-```typescript
-// ✅ OK - When you need to log context before throwing
 try {
   await this.externalApi.charge(orderId);
 } catch (error) {
-  Logger.error(`Payment failed for order: ${orderId}`, error.stack);
-  throw new ErrorException({
-    errorCode: ErrorCodes.HttpServiceUnavailable,
-    message: "Payment gateway unavailable",
-    errors: [{ orderId }],
-  });
+  // ✅ Good: Log context before throwing mapped internal error
+  Logger.error(`Payment failed for order: ${orderId}`, error);
+  throw new ErrorException(ErrorCodes.HttpServiceUnavailable);
 }
 ```
 
-### Validation errors with field-level details
+### Promises & Async
 
-```typescript
-throw new ErrorException({
-  errorCode: ErrorCodes.HttpBadRequest,
-  message: "Validation failed",
-  errors: [
-    { field: "email", message: "Invalid email format" },
-    { field: "phone", message: "Phone number required" },
-  ],
-});
-```
-
-## 6. Async Error Handling
-
-- Always `await` all Promises
-- Never fire-and-forget without error handling
-
-```typescript
-// ❌ Dangerous - Unhandled rejection
-this.service.doHeavyWork();
-
-// ✅ Safe
-await this.service.doHeavyWork();
-// OR
-this.service.doHeavyWork().catch((err) => Logger.error(err));
-```
+Always `await` promises or handle their `.catch` method to prevent unhandled promise rejections.

@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: *.ts
+globs: **/*.ts
 ---
 
 You are a senior TypeScript expert. Follow these strict coding standards to ensure type safety, readability, and maintainability.

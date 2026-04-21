@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: *.controller.ts, *.dto.ts, *.module.ts
+globs: **/*.controller.ts, **/*.dto.ts, **/*.module.ts
 ---
 
 You are a senior NestJS developer and Architect. Follow these strict guidelines when designing modules, API endpoints, and DTOs.
@@ -42,6 +42,7 @@ Strictly enforce separation between HTTP layer and Business Logic.
 
 - ❌ **NO** business logic.
 - ❌ **NO** direct database access.
+- ❌ **NO** `try-catch` blocks. Let exceptions bubble up to the Global Exception Filter.
 - ✅ **DO** validate inputs using DTOs.
 - ✅ **DO** delegate work to Services.
 - ✅ **DO** return DTOs or simple types.
@@ -52,14 +53,6 @@ Strictly enforce separation between HTTP layer and Business Logic.
 async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
   const user = await this.userService.create(dto);
   return this.userMapper.toResponse(user);
-}
-
-// ❌ Wrong
-@Post()
-async create(@Body() body: any) {
-  if (!body.email) throw new BadRequestException(); // Use DTO validation instead
-  const user = await this.userRepo.save(body);      // No DB access in controller
-  return user;
 }
 ```
 
@@ -107,6 +100,7 @@ Place DTOs in `src/<module>/dtos/`.
 - **Never** use `any`.
 - **Always** use specific validators (`@IsEmail`, `@IsInt`, `@Min`, etc.).
 - **Always** whitelist properties (configure `ValidationPipe({ whitelist: true })` globally).
+- **Always** use `@Type(() => Number)` (from `class-transformer`) for Number fields in Query Payloads (because query params are parsed as strings by default).
 
 **Create DTO:**
 

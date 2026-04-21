@@ -57,17 +57,3 @@ export class UserController { ... }
 
 - ❌ **NEVER** use MD5 or plain SHA1.
 - ✅ **ALWAYS** use **Bcrypt** (rounds >= 10) or **Argon2**.
-
-## 5. Rate Limiting
-
-- Protect against DDoS and Brute Force.
-- Use `@nestjs/throttler` globally.
-
-```typescript
-ThrottlerModule.forRoot([
-  {
-    ttl: 60000,
-    limit: 10,
-  },
-]);
-```

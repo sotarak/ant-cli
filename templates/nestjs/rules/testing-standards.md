@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: *.spec.ts, *.test.ts
+globs: **/*.spec.ts, **/*.e2e-spec.ts, test/**/*.ts
 ---
 
 You are a senior QA/SDET. Follow these standards for robust, reliable testing.
