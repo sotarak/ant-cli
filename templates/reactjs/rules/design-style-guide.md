@@ -1,98 +1,93 @@
 # Design Style Guide
 
-This guide defines the design principles and standards for our React applications, focusing on **Tailwind CSS** and **Minimalist Design**.
+This guide defines the design principles and standards for our React applications, integrating **shadcn/ui**, **Tailwind CSS**, and our strict **Three-Layer Design System Tokens**.
 
 ## 1. Core Principles
 
-- **Minimalism**: "Less is more". Avoid clutter. Use whitespace effectively.
-- **Consistency**: Use standardized tokens for colors, spacing, and typography.
-- **Functionality**: Design for the user's goal, not for decoration.
-- **Mobile-First**: Always design and verify for mobile responsiveness.
+- **Token-Driven**: Never use raw hex codes or arbitrary utility classes (e.g., `text-indigo-600` or `bg-slate-900`) for themed elements.
+- **Minimalism & Functionality**: "Less is more". Avoid clutter. Use whitespace effectively. Design for the user's goal.
+- **Component Reusability**: Rely on standard UI components (shadcn/ui) rather than building bespoke DOM structures.
+- **Mobile-First**: Always design, build, and verify for responsive views.
 
-## 2. Tailwind Configuration
+## 2. Design System Architecture
 
-We stick to the default Tailwind palette with specific constraints to ensure consistency.
+We strictly adhere to a three-layer token architecture managed by the `design-system` skill.
 
-### Colors (Palette: Slate)
+### Three-Layer Structure
 
-Use `slate` for neutrals to give a premium, slightly cool technical feel.
+1. **Primitive Tokens**: The raw values (e.g., `--color-blue-600: #2563eb;`). _Do not use directly in components._
+2. **Semantic Tokens**: Purpose aliases (e.g., `--color-primary: var(--color-blue-600);`). _Use these for general layouts._
+3. **Component Tokens**: Component-specific values (e.g., `--button-bg: var(--color-primary);`). _Use inside components._
 
-- **Backgrounds**:
-  - `bg-white`: Cards, main content areas.
-  - `bg-slate-50`: Page backgrounds, inputs.
-  - `bg-slate-100`: Hover states, dividers.
-- **Text**:
-  - `text-slate-900`: Primary headings, body text.
-  - `text-slate-500`: Secondary text, labels, icons.
-  - `text-slate-400`: Placeholders.
-- **Borders**:
-  - `border-slate-200`: Default borders.
+**Example in code:**
 
-### Primary Color (Brand)
+```css
+/* CORRECT: Using tokens */
+background: hsl(var(--background));
+color: hsl(var(--primary));
 
-Define a semantic `primary` color (e.g., `indigo`, `blue`, or `violet`).
+/* INCORRECT: Hardcoding Tailwind colors */
+background: theme("colors.slate.900");
+```
 
-- `bg-indigo-600`: Primary buttons, active states.
-- `text-indigo-600`: Links, accents.
+## 3. Component Patterns (ui-styling)
 
-## 3. Component Patterns
+We use **shadcn/ui** via the `ui-styling` skill. Do not write custom CSS unless absolutely necessary. Build interfaces by composing primitive components.
 
 ### Buttons
 
+Always use the `<Button>` component provided by shadcn instead of raw HTML buttons with long Tailwind strings.
+
 ```tsx
 // Primary
-<button className="h-9 px-4 py-2 bg-slate-900 text-white rounded-md text-sm font-medium hover:bg-slate-800 transition-colors">
-  Save Changes
-</button>
+<Button variant="default">Save Changes</Button>
 
 // Secondary / Outline
-<button className="h-9 px-4 py-2 bg-white text-slate-900 border border-slate-200 rounded-md text-sm font-medium hover:bg-slate-50 transition-colors">
-  Cancel
-</button>
+<Button variant="outline">Cancel</Button>
 
 // Ghost
-<button className="h-9 px-4 py-2 text-slate-500 hover:text-slate-900 rounded-md text-sm font-medium hover:bg-slate-100 transition-colors">
-  Settings
-</button>
+<Button variant="ghost">Settings</Button>
 ```
 
 ### Cards
 
+Compose panels using the standard `Card` primitives for consistent padding and borders.
+
 ```tsx
-<div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6">
-  {children}
-</div>
+<Card>
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+  </CardHeader>
+  <CardContent>{children}</CardContent>
+</Card>
 ```
 
 ### Inputs
 
 ```tsx
-<input className="flex h-9 w-full rounded-md border border-slate-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50" />
+// Using shadcn's Input component
+<Input type="email" placeholder="Enter email..." />
 ```
 
-## 4. Typography
+## 4. Typography & Spacing
 
-Use a variable font setup (e.g., Inter).
+Both typography and spacing should rely on the configured Tailwind theme extended by our design-system CSS variables.
 
-- **H1**: `text-2xl font-bold tracking-tight text-slate-900`
-- **H2**: `text-xl font-semibold tracking-tight text-slate-900`
-- **H3**: `text-lg font-semibold tracking-tight text-slate-900`
-- **Body**: `text-sm leading-relaxed text-slate-900`
-- **Small**: `text-xs text-slate-500`
+- **Typography**: Utilize logical utility classes like `text-2xl`, `text-xl`, and `text-muted-foreground` (which maps to our semantic token).
+- **Spacing**: Use standard 4px grid utilities (`p-4`, `gap-4`, `my-6`). Avoid arbitrary values like `p-[17px]`.
 
-## 5. Spacing
+## 5. Dark Mode
 
-Use the 4px grid.
+Ensure consistency in Dark Mode. Because we use Semantic Tokens (`--background`, `--foreground`, `--primary`, `--muted`), dark mode will automatically be supported by the tokens CSS.
 
-- `p-4` (16px) is the standard padding for cards.
-- `gap-4` (16px) is the standard gap for grids/flex.
-- `my-6` (24px) for section separation.
+- **Do NOT** use `dark:bg-slate-900` manually unless creating a major exception.
+- Trust the design system variables (`bg-background`, `text-foreground`).
 
 ## 6. Anti-Patterns (Refusal Criteria)
 
 Using these patterns in code review will result in rejection:
 
-- ❌ **Hardcoded Values**: `width: 350px`, `color: #333`. (Use `w-[350px]` only if strictly necessary, never hex colors).
-- ❌ **Random Colors**: Using `red-500` then `red-600` inconsistently.
-- ❌ **Inconsistent Radius**: Mixing `rounded-md` and `rounded-xl`.
-- ❌ **Z-Index Wars**: Using `z-100`, `z-9999`. Use a standard scale (`z-10`, `z-20`, `z-30`, `z-40`, `z-50`).
+- ❌ **Hardcoded Values**: `width: 350px`, `color: #333`. Avoid `color: theme('colors.red.500')`.
+- ❌ **Arbitrary Tailwind Colors**: Using `bg-slate-500` or `text-indigo-600` instead of `bg-muted` or `text-primary`.
+- ❌ **Custom Implementations**: Building your own Dialog or Select dropdown instead of running `npx shadcn@latest add dialog`.
+- ❌ **Z-Index Wars**: Using `z-[100]`, `z-[9999]`. Use a standard scale based on UI layers.

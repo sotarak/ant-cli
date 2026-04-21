@@ -1,6 +1,6 @@
 {
   "name": "@sotarak/ant-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CLI tool to initialize .agent configuration for various frameworks — powered by Antigravity",
   "type": "module",
   "bin": {
